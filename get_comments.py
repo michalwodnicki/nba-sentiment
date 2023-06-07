@@ -1,11 +1,13 @@
 import praw
 from praw.models import MoreComments
 import pandas as pd
+import os
+from config import CLIENT_ID, CLIENT_SECRET, USER_AGENT
 
 reddit = praw.Reddit(
-    client_id="ntkKZqDx0KMcF3mo1i-SCQ",
-    client_secret="-SGJkpxOuMEQ881eERB9OELIICY2jw",
-    user_agent="nba-sentiment/1.0 (by u/moneymichal)",
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    user_agent=USER_AGENT,
 )
 
 print(reddit.user.me())
@@ -55,7 +57,7 @@ def get_comments(thread_id):
     return submission
 
 
-def make_comments_csv(submission):
+def make_comments_csv(submission, folderName):
     comments = submission.comments
     columns = ["id", "body", "score", "utc", "parent_id"]
     data = []
@@ -72,16 +74,28 @@ def make_comments_csv(submission):
         )
 
     df = pd.DataFrame(data, columns=columns)
+
     filename = str(submission.id) + ".csv"
-    df.to_csv(filename, index=False)
+    outputFolder = f"data/{folderName}"
+    os.makedirs(outputFolder, exist_ok=True)
+    output_path = os.path.join(outputFolder, filename)
+    df.to_csv(output_path, index=False)
 
     print(f"finished creating {filename}")
 
 
 def main():
-    game_ids = ["1365zfw", "1384hu8", "13a5us2", "13can6x", "13e8sqq", "13g2qr3"]
+    game_ids = [
+        "13khtbi",
+        "13mbddv",
+        "13o9v3a",
+        "13q4i9d",
+        "13rww5n",
+        "13tlgsh",
+        "13va0qi",
+    ]
     for id in game_ids:
-        make_comments_csv(get_comments(id))
+        make_comments_csv(get_comments(id), "MIAvBOS")
 
 
 if __name__ == "__main__":

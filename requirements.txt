@@ -1,0 +1,12 @@
+torch
+torchvision
+praw
+nltk
+textblob
+requests
+seaborn
+pandas
+pytz
+datetime
+numpy
+stanza

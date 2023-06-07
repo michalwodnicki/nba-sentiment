@@ -3,6 +3,7 @@ from praw.models import MoreComments
 import pandas as pd
 import os
 from config import CLIENT_ID, CLIENT_SECRET, USER_AGENT
+import time
 
 reddit = praw.Reddit(
     client_id=CLIENT_ID,
@@ -57,7 +58,7 @@ def get_comments(thread_id):
     return submission
 
 
-def make_comments_csv(submission, folderName):
+def make_comments_csv(submission, folderName, game_num):
     comments = submission.comments
     columns = ["id", "body", "score", "utc", "parent_id"]
     data = []
@@ -74,8 +75,8 @@ def make_comments_csv(submission, folderName):
         )
 
     df = pd.DataFrame(data, columns=columns)
-
-    filename = str(submission.id) + ".csv"
+    df["game_number"] = str(game_num)
+    filename = f"game_{game_num}.csv"
     outputFolder = f"data/{folderName}"
     os.makedirs(outputFolder, exist_ok=True)
     output_path = os.path.join(outputFolder, filename)
@@ -84,19 +85,24 @@ def make_comments_csv(submission, folderName):
     print(f"finished creating {filename}")
 
 
-def main():
-    game_ids = [
-        "13khtbi",
-        "13mbddv",
-        "13o9v3a",
-        "13q4i9d",
-        "13rww5n",
-        "13tlgsh",
-        "13va0qi",
-    ]
-    for id in game_ids:
-        make_comments_csv(get_comments(id), "MIAvBOS")
+def main(game_ids, foldername):
+    for num, id in enumerate(game_ids):
+        start_time = time.perf_counter()
+        make_comments_csv(get_comments(id), foldername, num + 1)
+        finish_time = time.perf_counter()
+        print(f"Scraping finished in {finish_time-start_time} seconds")
 
 
 if __name__ == "__main__":
-    main()
+    main(
+        game_ids=[
+            "13khtbi",
+            "13mbddv",
+            "13o9v3a",
+            "13q4i9d",
+            "13rww5n",
+            "13tlgsh",
+            "13va0qi",
+        ],
+        foldername="MIAvBOS",
+    )
